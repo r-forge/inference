@@ -38,12 +38,17 @@ NULL
 ##' @slot two.sided Boolean indicator whether p-values corresond to a
 ##' two-sided test or one-sided; object of class \code{logical}.
 ##' @slot ci.level Confidence level; object of class \code{numeric}.
+##' @slot others List containing other information about the model;
+##' eg, summary of cluster size for \code{gee} and \code{lme} objects;
+##' number of events for \code{coxph} objects.
+##' @exportClass inference
 setClass(Class="inference"
          , representation=representation(model="character"
              , sample.size="numeric"
              , robust.se="logical"
              , two.sided="logical"
-             , ci.level="numeric")
+             , ci.level="numeric"
+             , others="list")
          , contains=c("matrix"))
 
 ##' Show/print \code{inference} object.
@@ -51,7 +56,7 @@ setClass(Class="inference"
 ##' \code{show} method for objects made using the \code{infer} function.
 ##' @rdname show,inference-method
 ##' @aliases print.inference
-##' @param \code{inference} object.
+##' @param object \code{inference} object.
 ##' @return Nothing.
 ##' @author Vinh Nguyen
 setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
@@ -64,7 +69,7 @@ setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
 ##' @aliases infer infer,-method infer,lm-method infer,glm-method
 ##' @docType methods
 ##' @usage infer(fitobj, vars=NULL, robust.se=TRUE, two.sided=TRUE
-##' , ci.level=0.95)
+##' , ci.level=0.95, ...)
 ##' @param fitobj Fitted model object, such as those of class \code{lm}.
 ##' @param vars Vector of variable names to obtain inference information
 ##' for.  Defaults to \code{NULL} which corresponds to all variables
@@ -79,7 +84,7 @@ setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
 ##' @return S4 \code{inference} object.
 ##' @examples
 ##' infer(lm(rnorm(100) ~ runif(100)))
-##' @export
+##' @exportMethod infer
 ##' @author Vinh Nguyen
 setGeneric(name="infer", function(fitobj, ...) standardGeneric("infer"))
 
@@ -100,7 +105,7 @@ setMethod("infer", signature(fitobj="lm"), function(fitobj, vars=NULL, robust.se
   ci.hi <- point.est + abs(qnorm((1-ci.level)/2)) * se
   n <- length(fitobj$residuals)
   ##return(cbind(point.est, se, p.value, ci.lo, ci.hi, n))
-  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level)
+  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, others=list("empty"))
   return(rslt)
 })
 
@@ -121,7 +126,83 @@ setMethod("infer", signature(fitobj="glm"), function(fitobj, vars=NULL, robust.s
   ci.hi <- point.est + abs(qnorm((1-ci.level)/2)) * se
   n <- length(fitobj$residuals)
   ##return(cbind(point.est, se, p.value, ci.lo, ci.hi, n))
-  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level)
+  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, others=list("empty"))
+  return(rslt)
+})
+
+##' @nord
+setMethod("infer", signature(fitobj="gee"), function(fitobj, vars=NULL, robust.se=TRUE, two.sided=TRUE, ci.level=0.95, transform=NULL)
+{
+  if(is.null(vars)) vars <- names(coef(fitobj))
+  point.est <- coef(fitobj)[vars]
+  if(robust.se){
+    ##require(sandwich)
+    se <- sqrt(diag(fitobj$robust.variance)[vars])
+  } else{
+    se <- sqrt(diag(fitobj$naive.variance)[vars])
+  }
+  p.value <- 1 - pnorm(abs(point.est/se))
+  if(two.sided) p.value <- 2*p.value
+  ci.lo <- point.est - abs(qnorm((1-ci.level)/2)) * se
+  ci.hi <- point.est + abs(qnorm((1-ci.level)/2)) * se
+  n <- length(unique(fitobj$id))
+  nObs <- fitobj$nobs
+  summaryClusters <- summary(tapply(fitobj$id, fitobj$id, length))
+  ##return(cbind(point.est, se, p.value, ci.lo, ci.hi, n))
+  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, others=list(nObs=nObs, summaryClusters=summaryClusters))
+  return(rslt)
+})
+
+##' @nord
+setMethod("infer", signature(fitobj="lme"), function(fitobj, vars=NULL, robust.se=FALSE, two.sided=TRUE, ci.level=0.95, transform=NULL)
+{
+  if(is.null(vars)) vars <- names(coef(fitobj))
+  point.est <- fixed.effects(fitobj)[vars] ##coef(fitobj)[vars]
+  if(robust.se){
+    ##require(sandwich)
+    ##se <- sqrt(diag(sandwich(fitobj))[vars])
+    stop("Robust standard errors are not available with Linear Mixed Effects Models.")
+  } else{
+    se <- sqrt(diag(vcov(fitobj))[vars])
+  }
+  p.value <- 1 - pnorm(abs(point.est/se))
+  if(two.sided) p.value <- 2*p.value
+  ci.lo <- point.est - abs(qnorm((1-ci.level)/2)) * se
+  ci.hi <- point.est + abs(qnorm((1-ci.level)/2)) * se
+  n <- fitobj$dims$ngrps["Subject"]
+  nObs <- fitobj$dims$N
+  summaryClusters <- summary(tapply(fitobj$groups[, 1], fitobj$groups[, 1], length))
+  ##return(cbind(point.est, se, p.value, ci.lo, ci.hi, n))
+  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, others=list(nObs=nObs, summaryClusters=summaryClusters))
+  return(rslt)
+})
+
+##' @nord
+setMethod("infer", signature(fitobj="coxph"), function(fitobj, vars=NULL, robust.se=TRUE, two.sided=TRUE, ci.level=0.95, transform=NULL)
+{
+  if(is.null(vars)) vars <- names(coef(fitobj))
+  point.est <- coef(fitobj)[vars]
+  if(robust.se){
+    require(sandwich)
+    if(any(names(fitobj) == "naive.var")){
+      se <- sqrt(diag(vcov(fitobj))[vars])
+    } else{
+      se <- sqrt(diag(sandwich(fitobj))[vars])
+    }
+  } else{
+    if(any(names(fitobj) == "naive.var")){
+      warning("Only robust standard errors available due to robust=TRUE specification in coxph.")
+    }
+    se <- sqrt(diag(vcov(fitobj))[vars])
+  }
+  p.value <- 1 - pnorm(abs(point.est/se))
+  if(two.sided) p.value <- 2*p.value
+  ci.lo <- point.est - abs(qnorm((1-ci.level)/2)) * se
+  ci.hi <- point.est + abs(qnorm((1-ci.level)/2)) * se
+  n <- length(fitobj$residuals)
+  n.events <- sum(fitobj$y[, 2])
+  ##return(cbind(point.est, se, p.value, ci.lo, ci.hi, n))
+  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, others=list(n.events=n.events))
   return(rslt)
 })
 
