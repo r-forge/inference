@@ -38,6 +38,8 @@ NULL
 ##' @slot two.sided Boolean indicator whether p-values corresond to a
 ##' two-sided test or one-sided; object of class \code{logical}.
 ##' @slot ci.level Confidence level; object of class \code{numeric}.
+##' @slot scale Scale of point estimates; object of class
+##' \code{character}; defaults to "beta".
 ##' @slot others List containing other information about the model;
 ##' eg, summary of cluster size for \code{gee} and \code{lme} objects;
 ##' number of events for \code{coxph} objects.
@@ -48,6 +50,7 @@ setClass(Class="inference"
              , robust.se="logical"
              , two.sided="logical"
              , ci.level="numeric"
+             , scale="character"
              , others="list")
          , contains=c("matrix"))
 
@@ -105,7 +108,7 @@ setMethod("infer", signature(fitobj="lm"), function(fitobj, vars=NULL, robust.se
   ci.hi <- point.est + abs(qnorm((1-ci.level)/2)) * se
   n <- length(fitobj$residuals)
   ##return(cbind(point.est, se, p.value, ci.lo, ci.hi, n))
-  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, others=list("empty"))
+  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, scale="beta", others=list("empty"))
   return(rslt)
 })
 
@@ -126,7 +129,7 @@ setMethod("infer", signature(fitobj="glm"), function(fitobj, vars=NULL, robust.s
   ci.hi <- point.est + abs(qnorm((1-ci.level)/2)) * se
   n <- length(fitobj$residuals)
   ##return(cbind(point.est, se, p.value, ci.lo, ci.hi, n))
-  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, others=list("empty"))
+  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, scale="beta", others=list("empty"))
   return(rslt)
 })
 
@@ -149,7 +152,7 @@ setMethod("infer", signature(fitobj="gee"), function(fitobj, vars=NULL, robust.s
   nObs <- fitobj$nobs
   summaryClusters <- summary(tapply(fitobj$id, fitobj$id, length))
   ##return(cbind(point.est, se, p.value, ci.lo, ci.hi, n))
-  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, others=list(nObs=nObs, summaryClusters=summaryClusters))
+  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, scale="beta", others=list(nObs=nObs, summaryClusters=summaryClusters))
   return(rslt)
 })
 
@@ -173,7 +176,7 @@ setMethod("infer", signature(fitobj="lme"), function(fitobj, vars=NULL, robust.s
   nObs <- fitobj$dims$N
   summaryClusters <- summary(tapply(fitobj$groups[, 1], fitobj$groups[, 1], length))
   ##return(cbind(point.est, se, p.value, ci.lo, ci.hi, n))
-  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, others=list(nObs=nObs, summaryClusters=summaryClusters))
+  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, scale="beta", others=list(nObs=nObs, summaryClusters=summaryClusters))
   return(rslt)
 })
 
@@ -202,9 +205,11 @@ setMethod("infer", signature(fitobj="coxph"), function(fitobj, vars=NULL, robust
   n <- length(fitobj$residuals)
   n.events <- sum(fitobj$y[, 2])
   ##return(cbind(point.est, se, p.value, ci.lo, ci.hi, n))
-  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, others=list(n.events=n.events))
+  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, scale="beta", others=list(n.events=n.events))
   return(rslt)
 })
+
+
 
 ## library(roxygen)
 ## package.skeleton("inference2", code_files="inference.R", force=TRUE)
