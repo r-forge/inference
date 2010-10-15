@@ -210,7 +210,42 @@ setMethod("infer", signature(fitobj="coxph"), function(fitobj, vars=NULL, robust
 })
 
 
+##' \code{transform} method for class inference
+##'
+##' Transform the point estimates, confidence intervals, and standard
+##' errors based on the delta method.  This builds on the S3 generic
+##' function \code{transform} from the \code{base} package.
+##'
+##' It can be used to get the hazard ratio scale in inference objects
+##' created from \code{coxph} objects and the odds ratio scale from
+##' logistic regression (both using \code{f=exp, f.prime=exp}).
+##' @title Transformation of point estimates
+##' @rdname transform.inference 
+##' @param `_data` Object of class \code{inference}.
+##' @param f Function to transform the point estimates and confidence intervals; e.g., \code{exp}.
+##' @param f.prime Derivative of \code{f} in order to compute the standard
+##' error of the transformed point estimates based on the delta method.
+##' @param ... Nothing.
+##' @return Object of class \code{inference}.
+##' @author Vinh Nguyen
+transform.inference <- function(`_data`, f, f.prime, ...)
+{
+  infObj <- infObjTrans <- `_data`
+  stopifnot(is.function(f), class(infObj)=="inference")
+  infObjTrans[, "point.est"] <- f(infObj[, "point.est"])
+  infObjTrans[, "ci.lo"] <- f(infObj[, "ci.lo"])
+  infObjTrans[, "ci.hi"] <- f(infObj[, "ci.hi"])
+  if(missing(f.prime) | is.null(f.prime)){
+    warning("f.prime not provided.  Standard errors for the resulting 'inference' object does NOT correspond to that of the transformed point estimates.")
+  } else{
+    infObjTrans[, "se"] <- f.prime(infObj[, "point.est"]) * infObj[, "se"]
+  }
+  scale <- paste(as.character(substitute(f)), "( ", slot(infObj, "scale"), " )", sep="")
+  slot(infObjTrans, "scale") <- scale
+  return(infObjTrans)
+}
 
+## infObj <- infer(lm(runif(100) ~ rnorm(100)))
 ## library(roxygen)
 ## package.skeleton("inference2", code_files="inference.R", force=TRUE)
 ## roxygenize(package.dir="inference", roxygen.dir="inference", copy.package=FALSE, unlink.target=FALSE)
