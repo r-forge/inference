@@ -7,7 +7,8 @@ Maintainer: Vinh Nguyen <vinhdizzo@gmail.com>
 Description: Collection of functions to extract inferential values
     (point estimates, confidence intervals, p-values, etc) of a fitted
     model object into a matrix-like object that can be used for
-    table/report generation; transform point estimates via the delta method.
+    table/report generation; transform point estimates via the delta
+    method.
 License: GPL (>= 2)
 Type: Package
 URL: http://r-forge.r-project.org/projects/inference/
