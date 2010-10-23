@@ -21,28 +21,26 @@ NULL
 
 ##' An S4 class that stores inferential values of a fitted model object.
 ##'
-##' An S4 class that inherits from the \code{matrix} class.  Rows
+##' An S4 class that inherits from the \code{\link[=structure-class]{matrix}}
+##' class in the \code{methods} package; see \code{class?matrix}.  Rows
 ##' correspond to different coefficients and columns consist of point
 ##' estimates (point.est), confidence intervals (ci.lo and ci.hi),
 ##' p-values (p.value), and sample size (n).
 ##'
 ##' @rdname inference-class
 ##' @docType class
-##' @slot .Data Object of class \code{matrix}.
-##' @slot model Class of model fit; object of class \code{character},
-##' such as "lm".
-##' @slot sample.size Sample size used in model fit; object of class
-##' \code{numeric}.
+##' @slot .Data
+##' @slot model String specifying class of model fit, such as "lm".
+##' @slot sample.size Sample size used in model fit.
 ##' @slot robust.se Boolean indicator whether robust standard errors were
-##' used; object of class \code{logical}.
+##' used.
 ##' @slot two.sided Boolean indicator whether p-values corresond to a
-##' two-sided test or one-sided; object of class \code{logical}.
-##' @slot ci.level Confidence level; object of class \code{numeric}.
-##' @slot scale Scale of point estimates; object of class
-##' \code{character}; defaults to "beta".
+##' two-sided test or one-sided.
+##' @slot ci.level Confidence level, e.g., 0.95.
+##' @slot scale Scale of point estimates; defaults to "beta".
 ##' @slot others List containing other information about the model;
-##' eg, summary of cluster size for \code{gee} and \code{lme} objects;
-##' number of events for \code{coxph} objects.
+##' eg, summary of cluster size for \code{\link{gee}} and \code{\link{lme}} objects;
+##' number of events for \code{\link{coxph}} objects.
 ##' @exportClass inference
 setClass(Class="inference"
          , representation=representation(model="character"
@@ -54,12 +52,12 @@ setClass(Class="inference"
              , others="list")
          , contains=c("matrix"))
 
-##' Show/print \code{inference} object.
+##' Show/print \code{\linkS4class{inference}} object.
 ##'
-##' \code{show} method for objects made using the \code{infer} function.
+##' \code{\link[methods]{show}} method for objects made using the \code{\link{infer}} function.
 ##' @rdname show,inference-method
 ##' @aliases print.inference
-##' @param object \code{inference} object.
+##' @param object \code{\linkS4class{inference}} object.
 ##' @return Nothing.
 ##' @author Vinh Nguyen
 setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
@@ -73,7 +71,7 @@ setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
 ##' @docType methods
 ##' @usage infer(fitobj, vars=NULL, robust.se=TRUE, two.sided=TRUE
 ##' , ci.level=0.95, ...)
-##' @param fitobj Fitted model object, such as those of class \code{lm}.
+##' @param fitobj Fitted model object, such as those of class \code{\link{lm}}.
 ##' @param vars Vector of variable names to obtain inference information
 ##' for.  Defaults to \code{NULL} which corresponds to all variables
 ##' in the fitted model.
@@ -84,7 +82,7 @@ setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
 ##' \code{TRUE}.
 ##' @param ci.level Confidence level.  Defaults to 0.95.
 ##' @param ... Not used.
-##' @return S4 \code{inference} object.
+##' @return S4 \code{\linkS4class{inference}} object.
 ##' @examples
 ##' infer(lm(rnorm(100) ~ runif(100)))
 ##' @exportMethod infer
@@ -210,23 +208,24 @@ setMethod("infer", signature(fitobj="coxph"), function(fitobj, vars=NULL, robust
 })
 
 
-##' \code{transform} method for class inference
+##' \code{\link{transform}} method for class inference
 ##'
 ##' Transform the point estimates, confidence intervals, and standard
 ##' errors based on the delta method.  This builds on the S3 generic
-##' function \code{transform} from the \code{base} package.
+##' function \code{\link{transform}} from the \code{base} package.
 ##'
 ##' It can be used to get the hazard ratio scale in inference objects
-##' created from \code{coxph} objects and the odds ratio scale from
-##' logistic regression (both using \code{f=exp, f.prime=exp}).
+##' created from \code{\link{coxph}} objects and the odds ratio scale from
+##' logistic regression created from \code{\link{glm}}
+##' (both using \code{f=exp, f.prime=exp}).
 ##' @title Transformation of point estimates
 ##' @rdname transform.inference 
-##' @param `_data` Object of class \code{inference}.
-##' @param f Function to transform the point estimates and confidence intervals; e.g., \code{exp}.
+##' @param `_data` Object of class \code{\linkS4class{inference}}.
+##' @param f Function to transform the point estimates and confidence intervals; e.g., \code{\link{exp}}.
 ##' @param f.prime Derivative of \code{f} in order to compute the standard
 ##' error of the transformed point estimates based on the delta method.
 ##' @param ... Nothing.
-##' @return Object of class \code{inference}.
+##' @return Object of class \code{\linkS4class{inference}}.
 ##' @author Vinh Nguyen
 transform.inference <- function(`_data`, f, f.prime, ...)
 {

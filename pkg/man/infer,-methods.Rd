@@ -12,9 +12,9 @@ p-values, and sample size.}
 \alias{infer,lm-method}
 \alias{infer,glm-method}
 \docType{methods}
-\value{S4 \code{inference} object.}
+\value{S4 \code{\linkS4class{inference}} object.}
 \author{Vinh Nguyen}
-\arguments{\item{fitobj}{Fitted model object, such as those of class \code{lm}.}
+\arguments{\item{fitobj}{Fitted model object, such as those of class \code{\link{lm}}.}
 \item{vars}{Vector of variable names to obtain inference information
 for.  Defaults to \code{NULL} which corresponds to all variables
 in the fitted model.}
