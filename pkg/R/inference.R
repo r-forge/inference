@@ -67,7 +67,7 @@ setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
 ##' Extract point estimates, standard errors, confidence intervals,
 ##' p-values, and sample size.
 ##' @rdname infer,-methods
-##' @aliases infer infer,-method infer,lm-method infer,glm-method infer,coxph-method infer,gee-method infer,lme-method
+##' @aliases infer infer,-method infer,lm-method infer,glm-method infer,coxph-method infer,gee-method infer,lme-method infer,lmer-method
 ##' @docType methods
 ##' @usage infer(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95, ...)
 ##' @param fitobj Fitted model object, such as those of class \code{\link[stats]{lm}}.
@@ -133,6 +133,37 @@ setMethod("infer", signature(fitobj="glm"), function(fitobj, vars, robust.se=TRU
   return(rslt)
 })
 
+## add infer,coxph-method to @aliases in infer documentation
+##' @nord
+setMethod("infer", signature(fitobj="coxph"), function(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95)
+{
+  if(missing(vars)) vars <- names(coef(fitobj))
+  point.est <- coef(fitobj)[vars]
+  if(robust.se){
+    require(sandwich)
+    if(any(names(fitobj) == "naive.var")){
+      se <- sqrt(diag(vcov(fitobj))[vars])
+    } else{
+      se <- sqrt(diag(sandwich(fitobj))[vars])
+    }
+  } else{
+    if(any(names(fitobj) == "naive.var")){
+      warning("Only robust standard errors available due to robust=TRUE specification in coxph.")
+    }
+    se <- sqrt(diag(vcov(fitobj))[vars])
+  }
+  p.value <- 1 - pnorm(abs(point.est/se))
+  if(two.sided) p.value <- 2*p.value
+  ci.lo <- point.est - abs(qnorm((1-ci.level)/2)) * se
+  ci.hi <- point.est + abs(qnorm((1-ci.level)/2)) * se
+  n <- length(fitobj$residuals)
+  n.events <- sum(fitobj$y[, 2])
+  ##return(cbind(point.est, se, p.value, ci.lo, ci.hi, n))
+  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, scale="beta", others=list(n.events=n.events))
+  return(rslt)
+})
+
+
 ## add infer,gee-method to @aliases in infer documentation
 ##' @nord
 setMethod("infer", signature(fitobj="gee"), function(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95)
@@ -182,35 +213,33 @@ setMethod("infer", signature(fitobj="lme"), function(fitobj, vars, robust.se=FAL
   return(rslt)
 })
 
-## add infer,coxph-method to @aliases in infer documentation
+## add infer,mer-method to @aliases in infer documentation
 ##' @nord
-setMethod("infer", signature(fitobj="coxph"), function(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95)
+setMethod("infer", signature(fitobj="mer"), function(fitobj, vars, robust.se=FALSE, two.sided=TRUE, ci.level=0.95)
 {
-  if(missing(vars)) vars <- names(coef(fitobj))
-  point.est <- coef(fitobj)[vars]
+  if(missing(vars)) vars <- colnames(coef(fitobj)[[1]])
+  point.est <- fitobj@fixef[vars] ##coef(fitobj)[vars]
+  SEfitobj <- sqrt(diag(vcov(fitobj)))
+  names(SEfitobj) <- names(fitobj@fixef)
   if(robust.se){
-    require(sandwich)
-    if(any(names(fitobj) == "naive.var")){
-      se <- sqrt(diag(vcov(fitobj))[vars])
-    } else{
-      se <- sqrt(diag(sandwich(fitobj))[vars])
-    }
+    ##require(sandwich)
+    ##se <- sqrt(diag(sandwich(fitobj))[vars])
+    stop("Robust standard errors are not available with Linear Mixed Effects Models.")
   } else{
-    if(any(names(fitobj) == "naive.var")){
-      warning("Only robust standard errors available due to robust=TRUE specification in coxph.")
-    }
-    se <- sqrt(diag(vcov(fitobj))[vars])
+    se <- se <- SEfitobj[vars]
   }
   p.value <- 1 - pnorm(abs(point.est/se))
   if(two.sided) p.value <- 2*p.value
   ci.lo <- point.est - abs(qnorm((1-ci.level)/2)) * se
   ci.hi <- point.est + abs(qnorm((1-ci.level)/2)) * se
-  n <- length(fitobj$residuals)
-  n.events <- sum(fitobj$y[, 2])
+  n <- slot(fitobj, "dims")["q"]
+  nObs <- slot(fitobj, "dims")["n"]
+  summaryClusters <- summary(tapply(slot(fm1, "flist")[, 1], slot(fm1, "flist")[, 1], length))
   ##return(cbind(point.est, se, p.value, ci.lo, ci.hi, n))
-  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, scale="beta", others=list(n.events=n.events))
+  rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, scale="beta", others=list(nObs=nObs, summaryClusters=summaryClusters))
   return(rslt)
 })
+
 
 
 ##' \code{\link[base]{transform}} method for class inference
