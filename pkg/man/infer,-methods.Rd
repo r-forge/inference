@@ -2,8 +2,7 @@
 \alias{infer-methods}
 \alias{infer}
 \title{Inference for fitted model objects.}
-\usage{infer(fitobj, vars=NULL, robust.se=TRUE, two.sided=TRUE
-, ci.level=0.95, ...)}
+\usage{infer(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95, ...)}
 \description{Inference for fitted model objects.}
 \details{Extract point estimates, standard errors, confidence intervals,
 p-values, and sample size.}
@@ -11,12 +10,15 @@ p-values, and sample size.}
 \alias{infer,-method}
 \alias{infer,lm-method}
 \alias{infer,glm-method}
+\alias{infer,coxph-method}
+\alias{infer,gee-method}
+\alias{infer,lme-method}
 \docType{methods}
 \value{S4 \code{\linkS4class{inference}} object.}
 \author{Vinh Nguyen}
-\arguments{\item{fitobj}{Fitted model object, such as those of class \code{\link{lm}}.}
+\arguments{\item{fitobj}{Fitted model object, such as those of class \code{\link[stats]{lm}}.}
 \item{vars}{Vector of variable names to obtain inference information
-for.  Defaults to \code{NULL} which corresponds to all variables
+for.  If not specified, all variables in the fitted model will be used.
 in the fitted model.}
 \item{robust.se}{Boolean indicator for whether robust standard
 errors should be use.  Defaults to \code{TRUE}.}

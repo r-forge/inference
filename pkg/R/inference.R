@@ -7,7 +7,7 @@
 ##' of summary tables (R -> LaTeX -> html -> Word) for publication and
 ##' collaboration.
 ##'
-##' @rdname inference-package
+##' @name inference-package
 ##' @docType package
 ##' @author Vinh Nguyen \email{vinhdizzo at gmail dot com}
 ##' @keywords statistical models point estimates confidence intervals
@@ -16,6 +16,8 @@
 ##' @examples
 ##' infer(lm(rnorm(100) ~ runif(100)))
 NULL
+## don't use @rdname alone in above.  will just use @name
+
 
 ##' An S4 class that stores inferential values of a fitted model object.
 ##'
@@ -65,13 +67,12 @@ setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
 ##' Extract point estimates, standard errors, confidence intervals,
 ##' p-values, and sample size.
 ##' @rdname infer,-methods
-##' @aliases infer infer,-method infer,lm-method infer,glm-method
+##' @aliases infer infer,-method infer,lm-method infer,glm-method infer,coxph-method infer,gee-method infer,lme-method
 ##' @docType methods
-##' @usage infer(fitobj, vars=NULL, robust.se=TRUE, two.sided=TRUE
-##' , ci.level=0.95, ...)
+##' @usage infer(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95, ...)
 ##' @param fitobj Fitted model object, such as those of class \code{\link[stats]{lm}}.
 ##' @param vars Vector of variable names to obtain inference information
-##' for.  Defaults to \code{NULL} which corresponds to all variables
+##' for.  If not specified, all variables in the fitted model will be used.
 ##' in the fitted model.
 ##' @param robust.se Boolean indicator for whether robust standard
 ##' errors should be use.  Defaults to \code{TRUE}.
@@ -85,12 +86,14 @@ setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
 ##' infer(lm(rnorm(100) ~ runif(100)))
 ##' @exportMethod infer
 ##' @author Vinh Nguyen
-setGeneric(name="infer", function(fitobj, ...) standardGeneric("infer"))
+setGeneric(name="infer", function(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95, ...) standardGeneric("infer"))
+##setGeneric(name="infer", function(fitobj, ...) standardGeneric("infer"))
 
+## add infer,lm-method to @aliases in infer documentation
 ##' @nord
-setMethod("infer", signature(fitobj="lm"), function(fitobj, vars=NULL, robust.se=TRUE, two.sided=TRUE, ci.level=0.95)
+setMethod("infer", signature(fitobj="lm"), function(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95)
 {
-  if(is.null(vars)) vars <- names(coef(fitobj))
+  if(missing(vars)) vars <- names(coef(fitobj))
   point.est <- coef(fitobj)[vars]
   if(robust.se){
     require(sandwich)
@@ -108,10 +111,11 @@ setMethod("infer", signature(fitobj="lm"), function(fitobj, vars=NULL, robust.se
   return(rslt)
 })
 
+## add infer,glm-method to @aliases in infer documentation
 ##' @nord
-setMethod("infer", signature(fitobj="glm"), function(fitobj, vars=NULL, robust.se=TRUE, two.sided=TRUE, ci.level=0.95, transform=NULL)
+setMethod("infer", signature(fitobj="glm"), function(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95)
 {
-  if(is.null(vars)) vars <- names(coef(fitobj))
+  if(missing(vars)) vars <- names(coef(fitobj))
   point.est <- coef(fitobj)[vars]
   if(robust.se){
     require(sandwich)
@@ -129,10 +133,11 @@ setMethod("infer", signature(fitobj="glm"), function(fitobj, vars=NULL, robust.s
   return(rslt)
 })
 
+## add infer,gee-method to @aliases in infer documentation
 ##' @nord
-setMethod("infer", signature(fitobj="gee"), function(fitobj, vars=NULL, robust.se=TRUE, two.sided=TRUE, ci.level=0.95, transform=NULL)
+setMethod("infer", signature(fitobj="gee"), function(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95)
 {
-  if(is.null(vars)) vars <- names(coef(fitobj))
+  if(missing(vars)) vars <- names(coef(fitobj))
   point.est <- coef(fitobj)[vars]
   if(robust.se){
     ##require(sandwich)
@@ -152,10 +157,11 @@ setMethod("infer", signature(fitobj="gee"), function(fitobj, vars=NULL, robust.s
   return(rslt)
 })
 
+## add infer,lme-method to @aliases in infer documentation
 ##' @nord
-setMethod("infer", signature(fitobj="lme"), function(fitobj, vars=NULL, robust.se=FALSE, two.sided=TRUE, ci.level=0.95, transform=NULL)
+setMethod("infer", signature(fitobj="lme"), function(fitobj, vars, robust.se=FALSE, two.sided=TRUE, ci.level=0.95)
 {
-  if(is.null(vars)) vars <- names(coef(fitobj))
+  if(missing(vars)) vars <- names(coef(fitobj))
   point.est <- fixed.effects(fitobj)[vars] ##coef(fitobj)[vars]
   if(robust.se){
     ##require(sandwich)
@@ -176,10 +182,11 @@ setMethod("infer", signature(fitobj="lme"), function(fitobj, vars=NULL, robust.s
   return(rslt)
 })
 
+## add infer,coxph-method to @aliases in infer documentation
 ##' @nord
-setMethod("infer", signature(fitobj="coxph"), function(fitobj, vars=NULL, robust.se=TRUE, two.sided=TRUE, ci.level=0.95, transform=NULL)
+setMethod("infer", signature(fitobj="coxph"), function(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95)
 {
-  if(is.null(vars)) vars <- names(coef(fitobj))
+  if(missing(vars)) vars <- names(coef(fitobj))
   point.est <- coef(fitobj)[vars]
   if(robust.se){
     require(sandwich)
@@ -217,7 +224,8 @@ setMethod("infer", signature(fitobj="coxph"), function(fitobj, vars=NULL, robust
 ##' logistic regression created from \code{\link[stats]{glm}}
 ##' (both using \code{f=exp, f.prime=exp}).
 ##' @title Transformation of point estimates
-##' @rdname transform.inference 
+##' @rdname transform.inference
+##' @usage transform.inference <- function(`_data`, f, f.prime, ...)
 ##' @param `_data` Object of class \code{\linkS4class{inference}}.
 ##' @param f Function to transform the point estimates and confidence intervals; e.g., \code{\link[base]{exp}}.
 ##' @param f.prime Derivative of \code{f} in order to compute the standard

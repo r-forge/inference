@@ -12,7 +12,7 @@ p-values (p.value), and sample size (n).}
 \section{Slots}{\describe{\item{\code{.Data}:}{}\item{\code{model}:}{(\code{\link{character}}) String specifying class of model fit, such as "lm".}\item{\code{sample.size}:}{(\code{\link{numeric}}) Sample size used in model fit.}\item{\code{robust.se}:}{(\code{\link{logical}}) Boolean indicator whether robust standard errors were
 used.}\item{\code{two.sided}:}{(\code{\link{logical}}) Boolean indicator whether p-values corresond to a
 two-sided test or one-sided.}\item{\code{ci.level}:}{(\code{\link{numeric}}) Confidence level, e.g., 0.95.}\item{\code{scale}:}{(\code{\link{character}}) Scale of point estimates; defaults to "beta".}\item{\code{others}:}{(\code{\link{list}}) List containing other information about the model;
-eg, summary of cluster size for \code{\link{gee}} and \code{\link{lme}} objects;
-number of events for \code{\link{coxph}} objects.}}}
+eg, summary of cluster size for \code{\link[gee]{gee}} and \code{\link[nlme]{lme}} objects;
+number of events for \code{\link[survival]{coxph}} objects.}}}
 \section{Extends}{\code{\linkS4class{matrix}}}
 

@@ -9,7 +9,6 @@ model in a matrix-like object.  The purpose is to have all inferential
 numbers be readily accessible, especially in the construction
 of summary tables (R -> LaTeX -> html -> Word) for publication and
 collaboration.}
-\alias{inference}
 \docType{package}
 \author{Vinh Nguyen \email{vinhdizzo at gmail dot com}}
 \keyword{statistical}
