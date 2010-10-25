@@ -7,9 +7,7 @@
 ##' of summary tables (R -> LaTeX -> html -> Word) for publication and
 ##' collaboration.
 ##'
-##' @name inference-package
 ##' @rdname inference-package
-##' @aliases inference
 ##' @docType package
 ##' @author Vinh Nguyen \email{vinhdizzo at gmail dot com}
 ##' @keywords statistical models point estimates confidence intervals
@@ -39,8 +37,8 @@ NULL
 ##' @slot ci.level Confidence level, e.g., 0.95.
 ##' @slot scale Scale of point estimates; defaults to "beta".
 ##' @slot others List containing other information about the model;
-##' eg, summary of cluster size for \code{\link{gee}} and \code{\link{lme}} objects;
-##' number of events for \code{\link{coxph}} objects.
+##' eg, summary of cluster size for \code{\link[gee]{gee}} and \code{\link[nlme]{lme}} objects;
+##' number of events for \code{\link[survival]{coxph}} objects.
 ##' @exportClass inference
 setClass(Class="inference"
          , representation=representation(model="character"
@@ -71,7 +69,7 @@ setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
 ##' @docType methods
 ##' @usage infer(fitobj, vars=NULL, robust.se=TRUE, two.sided=TRUE
 ##' , ci.level=0.95, ...)
-##' @param fitobj Fitted model object, such as those of class \code{\link{lm}}.
+##' @param fitobj Fitted model object, such as those of class \code{\link[stats]{lm}}.
 ##' @param vars Vector of variable names to obtain inference information
 ##' for.  Defaults to \code{NULL} which corresponds to all variables
 ##' in the fitted model.
@@ -208,20 +206,20 @@ setMethod("infer", signature(fitobj="coxph"), function(fitobj, vars=NULL, robust
 })
 
 
-##' \code{\link{transform}} method for class inference
+##' \code{\link[base]{transform}} method for class inference
 ##'
 ##' Transform the point estimates, confidence intervals, and standard
 ##' errors based on the delta method.  This builds on the S3 generic
-##' function \code{\link{transform}} from the \code{base} package.
+##' function \code{\link[base]{transform}} from the \code{base} package.
 ##'
 ##' It can be used to get the hazard ratio scale in inference objects
-##' created from \code{\link{coxph}} objects and the odds ratio scale from
-##' logistic regression created from \code{\link{glm}}
+##' created from \code{\link[survival]{coxph}} objects and the odds ratio scale from
+##' logistic regression created from \code{\link[stats]{glm}}
 ##' (both using \code{f=exp, f.prime=exp}).
 ##' @title Transformation of point estimates
 ##' @rdname transform.inference 
 ##' @param `_data` Object of class \code{\linkS4class{inference}}.
-##' @param f Function to transform the point estimates and confidence intervals; e.g., \code{\link{exp}}.
+##' @param f Function to transform the point estimates and confidence intervals; e.g., \code{\link[base]{exp}}.
 ##' @param f.prime Derivative of \code{f} in order to compute the standard
 ##' error of the transformed point estimates based on the delta method.
 ##' @param ... Nothing.
