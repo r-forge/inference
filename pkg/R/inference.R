@@ -67,7 +67,7 @@ setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
 ##' Extract point estimates, standard errors, confidence intervals,
 ##' p-values, and sample size.
 ##' @rdname infer,-methods
-##' @aliases infer infer,-method infer,lm-method infer,glm-method infer,coxph-method infer,gee-method infer,lme-method infer,lmer-method
+##' @aliases infer infer,-method infer,lm-method infer,glm-method infer,coxph-method infer,gee-method infer,lme-method infer,mer-method
 ##' @docType methods
 ##' @usage infer(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95, ...)
 ##' @param fitobj Fitted model object, such as those of class \code{\link[stats]{lm}}.
@@ -254,8 +254,8 @@ setMethod("infer", signature(fitobj="mer"), function(fitobj, vars, robust.se=FAL
 ##' (both using \code{f=exp, f.prime=exp}).
 ##' @title Transformation of point estimates
 ##' @rdname transform.inference
-##' @usage transform.inference <- function(`_data`, f, f.prime, ...)
-##' @param `_data` Object of class \code{\linkS4class{inference}}.
+##' @usage transform.inference(`_data`, f, f.prime, ...)
+##' @param _data Object of class \code{\linkS4class{inference}}.
 ##' @param f Function to transform the point estimates and confidence intervals; e.g., \code{\link[base]{exp}}.
 ##' @param f.prime Derivative of \code{f} in order to compute the standard
 ##' error of the transformed point estimates based on the delta method.
