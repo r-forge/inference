@@ -13,6 +13,7 @@ p-values, and sample size.}
 \alias{infer,coxph-method}
 \alias{infer,gee-method}
 \alias{infer,lme-method}
+\alias{infer,mer-method}
 \docType{methods}
 \value{S4 \code{\linkS4class{inference}} object.}
 \author{Vinh Nguyen}
