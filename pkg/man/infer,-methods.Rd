@@ -1,8 +1,8 @@
 \name{infer,-methods}
 \alias{infer-methods}
 \alias{infer}
-\title{Inference for fitted model objects.}
-\usage{infer(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95, ...)}
+\title{infer}
+\usage{infer(fitobj, vars, robust.se, two.sided=TRUE, ci.level=0.95, ...)}
 \description{Inference for fitted model objects.}
 \details{Extract point estimates, standard errors, confidence intervals,
 p-values, and sample size.}
@@ -19,10 +19,9 @@ p-values, and sample size.}
 \author{Vinh Nguyen}
 \arguments{\item{fitobj}{Fitted model object, such as those of class \code{\link[stats]{lm}}.}
 \item{vars}{Vector of variable names to obtain inference information
-for.  If not specified, all variables in the fitted model will be used.
-in the fitted model.}
+for.  If not specified, all variables in the fitted model will be used in the fitted model.}
 \item{robust.se}{Boolean indicator for whether robust standard
-errors should be use.  Defaults to \code{TRUE}.}
+errors should be use.  Defaults to \code{TRUE} for all models except \code{lme} and \code{mer}.}
 \item{two.sided}{Boolean indicator for whether p-values should
 correspond to a two-sided test or one-sided.  Defaults to
 \code{TRUE}.}
