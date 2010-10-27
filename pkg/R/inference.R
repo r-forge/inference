@@ -68,7 +68,7 @@ setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
 ##' p-values, and sample size.
 ##' @title infer
 ##' @rdname infer,-methods
-##' @aliases infer infer,-method infer,lm-method infer,glm-method infer,coxph-method infer,gee-method infer,lme-method infer,mer-method
+##' @aliases infer infer,-method infer,lm,ANY,ANY,ANY,ANY-method infer,glm,ANY,ANY,ANY,ANY-method infer,coxph,ANY,ANY,ANY,ANY-method infer,gee,ANY,ANY,ANY,ANY-method infer,lme,ANY,ANY,ANY,ANY-method infer,mer,ANY,ANY,ANY,ANY-method
 ##' @docType methods
 ##' @usage infer(fitobj, vars, robust.se, two.sided=TRUE, ci.level=0.95, ...)
 ##' @param fitobj Fitted model object, such as those of class \code{\link[stats]{lm}}.
@@ -86,10 +86,11 @@ setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
 ##' infer(lm(rnorm(100) ~ runif(100)))
 ##' @exportMethod infer
 ##' @author Vinh Nguyen
-setGeneric(name="infer", function(fitobj, ...) standardGeneric("infer"))
-##setGeneric(name="infer", function(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95, ...) standardGeneric("infer"))
+##setGeneric(name="infer", function(fitobj, ...) standardGeneric("infer"))
 ##setGeneric(name="infer", function(fitobj, vars, robust.se, two.sided, ci.level, ...) standardGeneric("infer"))
 ## NOTE: above is unconventional in that the function definition for the following take additional arguments; getMethod("infer", "lm") will show a .local().  Debug via trace("myFun", signature="myClass", browser, exit=browser) will not work.  To do so, add in browser() manually, traceback(), or options(error=recovery)
+## USE FOLLOWING, and just add ,ANY to aliases
+setGeneric(name="infer", function(fitobj, vars, robust.se=TRUE, two.sided=TRUE, ci.level=0.95, ...) standardGeneric("infer"))
 
 ## add infer,lm-method to @aliases in infer documentation
 ##' @nord
@@ -220,6 +221,7 @@ setMethod("infer", signature(fitobj="lme"), function(fitobj, vars, robust.se=FAL
 setMethod("infer", signature(fitobj="mer"), function(fitobj, vars, robust.se=FALSE, two.sided=TRUE, ci.level=0.95, ...)
 {
   if(missing(vars)) vars <- colnames(coef(fitobj)[[1]])
+  require(lme4) ## vcov() function
   point.est <- fitobj@fixef[vars] ##coef(fitobj)[vars]
   SEfitobj <- sqrt(diag(vcov(fitobj)))
   names(SEfitobj) <- names(fitobj@fixef)

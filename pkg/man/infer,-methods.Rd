@@ -6,14 +6,12 @@
 \description{Inference for fitted model objects.}
 \details{Extract point estimates, standard errors, confidence intervals,
 p-values, and sample size.}
-\alias{infer}
-\alias{infer,-method}
-\alias{infer,lm-method}
-\alias{infer,glm-method}
-\alias{infer,coxph-method}
-\alias{infer,gee-method}
-\alias{infer,lme-method}
-\alias{infer,mer-method}
+\alias{infer,lm,ANY,ANY,ANY,ANY-method}
+\alias{infer,glm,ANY,ANY,ANY,ANY-method}
+\alias{infer,coxph,ANY,ANY,ANY,ANY-method}
+\alias{infer,gee,ANY,ANY,ANY,ANY-method}
+\alias{infer,lme,ANY,ANY,ANY,ANY-method}
+\alias{infer,mer,ANY,ANY,ANY,ANY-method}
 \docType{methods}
 \value{S4 \code{\linkS4class{inference}} object.}
 \author{Vinh Nguyen}
