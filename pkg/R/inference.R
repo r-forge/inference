@@ -234,7 +234,7 @@ setMethod("infer", signature(fitobj="mer"), function(fitobj, vars, robust.se=FAL
   ci.hi <- point.est + abs(qnorm((1-ci.level)/2)) * se
   n <- slot(fitobj, "dims")["q"]
   nObs <- slot(fitobj, "dims")["n"]
-  summaryClusters <- summary(tapply(slot(fm1, "flist")[, 1], slot(fm1, "flist")[, 1], length))
+  summaryClusters <- summary(tapply(slot(fitobj, "flist")[, 1], slot(fitobj, "flist")[, 1], length))
   ##return(cbind(point.est, se, p.value, ci.lo, ci.hi, n))
   rslt <- new("inference", cbind(point.est, se, p.value, ci.lo, ci.hi, n), model=class(fitobj), sample.size=n, robust.se=robust.se, two.sided=two.sided, ci.level=ci.level, scale="beta", others=list(nObs=nObs, summaryClusters=summaryClusters))
   return(rslt)
