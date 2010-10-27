@@ -68,7 +68,8 @@ setMethod("show", "inference", function(object){ print(slot(object, ".Data"))})
 ##' p-values, and sample size.
 ##' @title infer
 ##' @rdname infer,-methods
-##' @aliases infer infer,-method infer,lm,ANY,ANY,ANY,ANY-method infer,glm,ANY,ANY,ANY,ANY-method infer,coxph,ANY,ANY,ANY,ANY-method infer,gee,ANY,ANY,ANY,ANY-method infer,lme,ANY,ANY,ANY,ANY-method infer,mer,ANY,ANY,ANY,ANY-method
+##' @aliases infer,lm-method infer,glm-method infer,coxph-method infer,gee-method infer,lme-method infer,mer-method
+##' @aliases infer,lm-method infer,lm,ANY,ANY,ANY,ANY-method infer,glm,ANY,ANY,ANY,ANY-method infer,coxph,ANY,ANY,ANY,ANY-method infer,gee,ANY,ANY,ANY,ANY-method infer,lme,ANY,ANY,ANY,ANY-method infer,mer,ANY,ANY,ANY,ANY-method
 ##' @docType methods
 ##' @usage infer(fitobj, vars, robust.se, two.sided=TRUE, ci.level=0.95, ...)
 ##' @param fitobj Fitted model object, such as those of class \code{\link[stats]{lm}}.
