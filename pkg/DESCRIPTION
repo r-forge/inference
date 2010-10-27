@@ -14,5 +14,5 @@ Type: Package
 URL: http://r-forge.r-project.org/projects/inference/
 BugReports:
     http://lists.r-forge.r-project.org/mailman/listinfo/inference-devel
-Depends: sandwich, methods
+Depends: methods, sandwich, lme4
 Collate: 'inference.R'

@@ -1,3 +1,4 @@
 import(methods)
 exportClasses(inference)
 exportMethods(infer)
+import(lme4)

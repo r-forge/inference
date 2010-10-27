@@ -197,7 +197,8 @@ setMethod("infer", signature(fitobj="gee"), function(fitobj, vars, robust.se=TRU
 setMethod("infer", signature(fitobj="lme"), function(fitobj, vars, robust.se=FALSE, two.sided=TRUE, ci.level=0.95, ...)
 {
   if(missing(vars)) vars <- names(coef(fitobj))
-  point.est <- fixed.effects(fitobj)[vars] ##coef(fitobj)[vars]
+  ##point.est <- fixed.effects(fitobj)[vars] ##coef(fitobj)[vars]
+  point.est <- fitobj$coefficients$fixed ## no dependency on nlme package
   if(robust.se){
     ##require(sandwich)
     ##se <- sqrt(diag(sandwich(fitobj))[vars])
@@ -219,6 +220,7 @@ setMethod("infer", signature(fitobj="lme"), function(fitobj, vars, robust.se=FAL
 
 ## add infer,mer-method to @aliases in infer documentation
 ##' @nord
+##' @import lme4
 setMethod("infer", signature(fitobj="mer"), function(fitobj, vars, robust.se=FALSE, two.sided=TRUE, ci.level=0.95, ...)
 {
   if(missing(vars)) vars <- colnames(coef(fitobj)[[1]])

@@ -12,6 +12,7 @@ p-values, and sample size.}
 \alias{infer,gee-method}
 \alias{infer,lme-method}
 \alias{infer,mer-method}
+\alias{infer,lm-method}
 \alias{infer,lm,ANY,ANY,ANY,ANY-method}
 \alias{infer,glm,ANY,ANY,ANY,ANY-method}
 \alias{infer,coxph,ANY,ANY,ANY,ANY-method}
