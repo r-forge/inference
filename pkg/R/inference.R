@@ -269,6 +269,7 @@ setMethod("infer", signature(fitobj="mer"), function(fitobj, vars, robust.se=FAL
 ##' @param ... Nothing.
 ##' @return Object of class \code{\linkS4class{inference}}.
 ##' @author Vinh Nguyen
+##' @export
 transform.inference <- function(`_data`, f, f.prime, ...)
 {
   infObj <- infObjTrans <- `_data`
@@ -292,6 +293,7 @@ transform.inference <- function(`_data`, f, f.prime, ...)
 ##' @param decimal Number of decimal places for point estimates and confidence intervals.
 ##' @return Vector of strings, for used in pretty printing.
 ##' @author Vinh Nguyen
+##' @export
 DisplayEst <- function(inference.object, decimal=2) {
   est <- paste(formatC(inference.object[, "point.est"], digits=decimal, format="f")
               , " ("
