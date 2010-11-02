@@ -286,6 +286,26 @@ transform.inference <- function(`_data`, f, f.prime, ...)
   return(infObjTrans)
 }
 
+##' Display point estimates and confidence intervals in parentheses.
+##' @title Display Estimates
+##' @param inference.object \code{\link{inference-class}}.
+##' @param decimal Number of decimal places for point estimates and confidence intervals.
+##' @return Vector of strings, for used in pretty printing.
+##' @author Vinh Nguyen
+DisplayEst <- function(inference.object, decimal=2) {
+  est <- paste(formatC(inference.object[, "point.est"], digits=decimal, format="f")
+              , " ("
+              , formatC(inference.object[, "ci.lo"], digits=decimal, format="f")
+              , ", "
+              , formatC(inference.object[, "ci.hi"], digits=decimal, format="f")
+              , ")"
+              , sep=""
+              )
+  names(est) <- rownames(inference.object)
+  return(est)
+}
+
+
 ## infObj <- infer(lm(runif(100) ~ rnorm(100)))
 ## library(roxygen)
 ## package.skeleton("inference2", code_files="inference.R", force=TRUE)

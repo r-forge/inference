@@ -1,6 +1,6 @@
 Package: inference
-Version: 0.1.0
-Date: 2010-10-22
+Version: 0.1.1
+Date: 2010-10-27
 Title: Functions to extract inferential values of a fitted model object
 Author: Vinh Nguyen <vinhdizzo@gmail.com>
 Maintainer: Vinh Nguyen <vinhdizzo@gmail.com>
